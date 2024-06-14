@@ -1,5 +1,8 @@
 import { Router } from "express";
-import protectRoute, { csrfProtection } from "../../utils/protectRoute.js";
+import protectRoute, {
+  generateToken,
+  csrfSynchronisedProtection,
+} from "../../utils/protectRoute.js";
 import home from "./home.js";
 import login from "./login.js";
 import dashboard from "./dashboard.js";
@@ -16,24 +19,32 @@ const router = Router();
 router.get("/", home);
 router
   .route("/login")
-  .get(csrfProtection, (req, res) =>
-    res.render("login", { csrfToken: req.csrfToken() }),
+  .get(csrfSynchronisedProtection, (req, res) =>
+    res.render("login", { csrfToken: generateToken(req) }),
   )
-  .post(csrfProtection, loginAdminValidation, login);
+  .post(csrfSynchronisedProtection, loginAdminValidation, login);
 
 router
   .route("/signup")
-  .get(csrfProtection, (req, res) =>
-    res.render("signup", { csrfToken: req.csrfToken() }),
+  .get(csrfSynchronisedProtection, (req, res) =>
+    res.render("signup", { csrfToken: generateToken(req) }),
   )
-  .post(csrfProtection, signUpAdminValidation, signUpAdmin);
+  .post(csrfSynchronisedProtection, signUpAdminValidation, signUpAdmin);
 
-router.get("/dashboard", protectRoute("/admin/login"), dashboard);
+router.get(
+  "/dashboard",
+  protectRoute("/admin/login"),
+  (req, res, next) => {
+    req.csrfToken = () => generateToken(req);
+    next();
+  },
+  dashboard,
+);
 router.get("/logout", logOut);
 router.post(
   "/moderate",
   protectRoute("/admin/login"),
-  csrfProtection,
+  csrfSynchronisedProtection,
   moderatePost,
 );
 

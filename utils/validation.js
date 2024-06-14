@@ -30,7 +30,7 @@ export const storePostValidation = [
     .notEmpty()
     .withMessage("'title field should not be empty")
     .escape(),
-  check("post.contet")
+  check("post.content")
     .notEmpty()
     .withMessage("content field should not be empty"),
   check("post.user")

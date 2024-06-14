@@ -16,7 +16,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // const logFile = join(__dirname, "blogchef.log");
 const PORT = process.env.PORT || 3000;
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'nonce-ps0QMWhuej5oqzobisuQnA=='"],
+        objectSrc: ["'self'"],
+        // Add other directives as needed
+      },
+    },
+  }),
+);
 app.use(compression());
 app.use("/assets", express.static(join(__dirname, "public")));
 app.use(express.static(join(__dirname, "public", "client")));

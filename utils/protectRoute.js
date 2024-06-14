@@ -1,5 +1,11 @@
 import { verifyUser } from "../controllers/user.js";
-import csurl from "csurf";
+import { csrfSync } from "csrf-sync";
+
+const { generateToken, csrfSynchronisedProtection } = csrfSync({
+  getTokenFromRequest: (req) => {
+    return req.body["_csrf"];
+  },
+});
 
 const protectRoute =
   (redirectTo = "/") =>
@@ -15,5 +21,5 @@ const protectRoute =
     }
   };
 
-export const csrfProtection = csurl();
 export default protectRoute;
+export { generateToken, csrfSynchronisedProtection };
